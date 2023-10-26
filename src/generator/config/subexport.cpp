@@ -919,7 +919,7 @@ std::string proxyToSurge(std::vector<Proxy> &nodes, const std::string &base_conf
 std::string proxyToSingle(std::vector<Proxy> &nodes, int types, extra_settings &ext) {
     /// types: SS=1 SSR=2 VMess=4 Trojan=8 VLESS=16
     std::string proxyStr, allLinks;
-    bool ss = GETBIT(types, 1), ssr = GETBIT(types, 2), vmess = GETBIT(types, 3), trojan = GETBIT(types, 4), vless = GETBIT(type, 5);
+    bool ss = GETBIT(types, 1), ssr = GETBIT(types, 2), vmess = GETBIT(types, 3), trojan = GETBIT(types, 4), vless = GETBIT(types, 5);
 
     for(Proxy &x : nodes)
     {

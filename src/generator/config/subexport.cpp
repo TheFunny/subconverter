@@ -1012,10 +1012,12 @@ std::string proxyToSingle(std::vector<Proxy> &nodes, int types, extra_settings &
                         proxyStr += "&host=" + host;
                         if (!path.empty())
                             proxyStr += "&path=" + urlEncode(path);
+                        break;
                 }
                 if (!faketype.empty())
                     proxyStr += "&headerType=" + faketype;
                 proxyStr += "#" + urlEncode(remark);
+                break;
             default:
                 continue;
         }

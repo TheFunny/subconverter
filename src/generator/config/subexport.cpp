@@ -996,14 +996,14 @@ std::string proxyToSingle(std::vector<Proxy> &nodes, int types, extra_settings &
                     if (!x.SpiderX.empty())
                         proxyStr += "&spx=" + x.SpiderX;
                 }
-                switch (transproto) {
-                    case "tcp":
+                switch (hash_(transproto)) {
+                    case "tcp"_hash:
                         break;
-                    case "grpc":
+                    case "grpc"_hash:
                         proxyStr += "&type=" + transproto;
                         proxyStr += "&mode=" + x.GRPCMode + "&serviceName=" + x.GRPCServiceName;
                         break;
-                    case "quic":
+                    case "quic"_hash:
                         proxyStr += "&type=" + transproto;
                         proxyStr += "&quicSecurity=" + x.QUICSecure + "&key=" + x.QUICSecret;
                         break;

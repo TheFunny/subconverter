@@ -917,9 +917,9 @@ std::string proxyToSurge(std::vector<Proxy> &nodes, const std::string &base_conf
 }
 
 std::string proxyToSingle(std::vector<Proxy> &nodes, int types, extra_settings &ext) {
-    /// types: SS=1 SSR=2 VMess=4 Trojan=8
+    /// types: SS=1 SSR=2 VMess=4 Trojan=8 VLESS=16
     std::string proxyStr, allLinks;
-    bool ss = GETBIT(types, 1), ssr = GETBIT(types, 2), vmess = GETBIT(types, 3), trojan = GETBIT(types, 4);
+    bool ss = GETBIT(types, 1), ssr = GETBIT(types, 2), vmess = GETBIT(types, 3), trojan = GETBIT(types, 4), vless = GETBIT(type, 5);
 
     for(Proxy &x : nodes)
     {
@@ -983,6 +983,39 @@ std::string proxyToSingle(std::vector<Proxy> &nodes, int types, extra_settings &
                 }
                 proxyStr += "#" + urlEncode(remark);
                 break;
+            case ProxyType::VLESS:
+                if (!vless)
+                    continue;
+                proxyStr = "vless://" + id + "@" + hostname + ":" + port + "?" + "?encryption=" + method;
+                if (!x.Flow.empty())
+                    proxyStr += "&flow=" + x.Flow;
+                if (tlssecure)
+                    proxyStr += "&security=" + x.VlessSecurity + "&sni=" + host;
+                if (x.VlessSecurity == "reality") {
+                    proxyStr += "&fp=" + x.Fingerprint + "&pbk=" + x.PublicKey + "&sid=" + x.ShortId;
+                    if (!x.SpiderX.empty())
+                        proxyStr += "&spx=" + x.SpiderX;
+                }
+                switch (transproto) {
+                    case "tcp":
+                        break;
+                    case "grpc":
+                        proxyStr += "&type=" + transproto;
+                        proxyStr += "&mode=" + x.GRPCMode + "&serviceName=" + x.GRPCServiceName;
+                        break;
+                    case "quic":
+                        proxyStr += "&type=" + transproto;
+                        proxyStr += "&quicSecurity=" + x.QUICSecure + "&key=" + x.QUICSecret;
+                        break;
+                    default:
+                        proxyStr += "&type=" + transproto;
+                        proxyStr += "&host=" + host;
+                        if (!path.empty())
+                            proxyStr += "&path=" + urlEncode(path);
+                }
+                if (!faketype.empty())
+                    proxyStr += "&headerType=" + faketype;
+                proxyStr += "#" + urlEncode(remark);
             default:
                 continue;
         }

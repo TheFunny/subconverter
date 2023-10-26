@@ -79,20 +79,21 @@ void hysteriaConstruct(Proxy &node, const std::string &group, const std::string 
     node.FakeType = type;
 }
 
-void vlessConstruct(Proxy &node, const std::string &group, const std::string &remarks, const std::string &add, const std::string &port, const std::string &type, const std::string &id, const std::string &aid, const std::string &net, const std::string &cipher, const std::string &flow, const std::string &mode, const std::string &path, const std::string &host, const std::string &edge, const std::string &tls,const std::string &pbk, const std::string &sid, const std::string &fp ,tribool udp, tribool tfo, tribool scv, tribool tls13)
+void vlessConstruct(Proxy &node, const std::string &group, const std::string &remarks, const std::string &add, const std::string &port, const std::string &type, const std::string &id, const std::string &net, const std::string &cipher, const std::string &flow, const std::string &mode, const std::string &path, const std::string &host, const std::string &edge, const std::string &tls,const std::string &pbk, const std::string &sid, const std::string &fp, const std::string &spx, tribool udp, tribool tfo, tribool scv, tribool tls13)
 {
     commonConstruct(node, ProxyType::VLESS, group, remarks, add, port, udp, tfo, scv, tls13);
     node.UserId = id.empty() ? "00000000-0000-0000-0000-000000000000" : id;
-    node.AlterId = to_int(aid);
     node.EncryptMethod = cipher;
     node.TransferProtocol = net.empty() ? "tcp" : type=="http" ? "http": net;
     node.Edge = edge;
     node.Flow = flow;
     node.FakeType = type;
     node.TLSSecure = tls == "tls" || tls == "xtls" || tls == "reality";
+    node.VlessSecurity = tls;
     node.PublicKey = pbk;
     node.ShortId = sid;
     node.Fingerprint = fp;
+    node.SpiderX = spx;
 
     switch(hash_(net))
     {
@@ -1101,7 +1102,6 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
             group = XRAY_DEFAULT_GROUP;
 
             singleproxy["uuid"] >>= id;
-            singleproxy["alterId"] >>= aid;
             net = singleproxy["network"].IsDefined() ? safe_as<std::string>(singleproxy["network"]) : "tcp";
             sni = singleproxy["sni"].IsDefined() ? safe_as<std::string>(singleproxy["sni"]) : safe_as<std::string>(singleproxy["servername"]) ;
             switch(hash_(net))
@@ -1144,10 +1144,11 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
                 printf("host:%s",host.c_str());
                 singleproxy["reality-opts"]["public-key"]>>=pbk;
                 singleproxy["reality-opts"]["short-id"]>>=sid;
+                // spx
             }
             singleproxy["flow"]>>=flow;
 
-            vlessConstruct(node, XRAY_DEFAULT_GROUP, ps, server, port, type, id, aid, net, "auto", flow, mode, path, host, "", tls, pbk, sid, fp);
+            vlessConstruct(node, XRAY_DEFAULT_GROUP, ps, server, port, type, id, net, "auto", flow, mode, path, host, "", tls, pbk, sid, fp, spx);
             break;        
         case "ss"_hash:
             group = SS_DEFAULT_GROUP;
@@ -1406,7 +1407,7 @@ void explodeStdHysteria(std::string hysteria, Proxy &node)
 
 void explodeStdVless(std::string vless, Proxy &node)
 {
-    std::string add, port, type, id, aid, net, flow, pbk, sid, fp, mode, path, host, tls, remarks;
+    std::string add, port, type, id, net, flow, pbk, sid, fp, spx, mode, path, host, tls, remarks;
     std::string addition;
     vless = vless.substr(8);
     string_size pos;
@@ -1427,6 +1428,7 @@ void explodeStdVless(std::string vless, Proxy &node)
     pbk = getUrlArg(addition,"pbk");
     sid = getUrlArg(addition,"sid");
     fp = getUrlArg(addition,"fp");
+    spx = getUrlArg(addition,"spx");
 
     switch(hash_(net))
     {
@@ -1454,7 +1456,7 @@ void explodeStdVless(std::string vless, Proxy &node)
     if(remarks.empty())
         remarks = add + ":" + port;
 
-    vlessConstruct(node, XRAY_DEFAULT_GROUP, remarks, add, port, type, id, aid, net, "auto", flow, mode, path, host, "", tls, pbk, sid, fp);
+    vlessConstruct(node, XRAY_DEFAULT_GROUP, remarks, add, port, type, id, net, "none", flow, mode, path, host, "", tls, pbk, sid, fp, spx);
     return;
 }
 

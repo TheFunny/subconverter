@@ -75,6 +75,7 @@ struct Proxy
     String TransferProtocol;
     String FakeType;
     bool TLSSecure = false;
+    String VlessSecurity;
 
     String Flow;
     bool FlowShow = false;
@@ -106,6 +107,7 @@ struct Proxy
     String Fingerprint;
     String PublicKey;
     String ShortId;
+    String SpiderX;
 
 };
 
